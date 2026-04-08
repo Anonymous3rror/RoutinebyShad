@@ -50,6 +50,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 24px 20px; transition: background 0.4s; }
 
+        .header-top { max-width: 1400px; margin: 0 auto 10px; }
+        .creator-credit { font-size: 0.9em; color: var(--text-secondary); opacity: 0.8; font-weight: 500; }
+
         .header { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 36px; }
         h1 { font-size: 2.1em; font-weight: 800; background: var(--accent-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
@@ -91,6 +94,10 @@
 </head>
 <body>
 
+    <div class="header-top">
+        <h4 class="creator-credit text-center">Created by Shad and Raihan helps with information.</h4>
+    </div>
+
     <div class="header">
         <h1>📚 একাডেমিক ড্যাশবোর্ড</h1>
         <button class="theme-toggle" id="themeToggle">☀️</button>
@@ -124,9 +131,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // ১. আপনার ব্যক্তিগত কাজগুলো এখানে যোগ করুন
-        // ==========================================
         const myTodos = [
             { text: "সয়েল", done: false },
             { text: "বোটানি", done: false },
@@ -134,9 +138,6 @@
             { text: "কেমিস্ট্রি", done: false }
         ];
 
-        // ==========================================
-        // ২. ক্লাসের রুটিন ডাটা
-        // ==========================================
         function getDaySchedule(dayIndex) {
             const schedules = {
                 0: { day: 'রবিবার', classes: [
@@ -168,7 +169,6 @@
             return schedules[dayIndex] || { day: '', classes: [] };
         }
 
-        // CALENDAR LOGIC
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth();
         const monthNames = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
@@ -180,24 +180,28 @@
 
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const todayStr = new Date().toISOString().split('T')[0];
+            
+            const now = new Date();
+            const todayDate = now.getDate();
+            const todayMonth = now.getMonth();
+            const todayYear = now.getFullYear();
 
             let row = document.createElement('tr');
             for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement('td'));
 
             for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month, day);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayIndex = date.getDay();
-
+                const dayIndex = new Date(year, month, day).getDay();
                 const cell = document.createElement('td');
                 cell.className = 'day-cell';
                 cell.textContent = day;
-                cell.dataset.date = dateStr;
+                
+                cell.dataset.day = day;
+                cell.dataset.month = month + 1;
+                cell.dataset.year = year;
                 cell.dataset.dayindex = dayIndex;
 
                 if (getDaySchedule(dayIndex).classes.length > 0) cell.classList.add('has-class');
-                if (dateStr === todayStr) cell.classList.add('today');
+                if (day === todayDate && month === todayMonth && year === todayYear) cell.classList.add('today');
 
                 row.appendChild(cell);
                 if ((firstDay + day) % 7 === 0 || day === daysInMonth) {
@@ -207,15 +211,16 @@
             }
         }
 
-        function showSchedule(dateStr, dayIndex) {
+        function showSchedule(d, m, y, dayIndex) {
             const sched = getDaySchedule(parseInt(dayIndex));
             const div = document.getElementById('scheduleContent');
             const title = document.getElementById('selectedDayTitle');
-            const [y, m, d] = dateStr.split('-');
             
-            title.textContent = `🗓 ${d}/${m}/${y} — ${sched.day}`;
+            const displayDate = `${d.toString().padStart(2, '0')}/${m.toString().padStart(2, '0')}/${y}`;
+            title.textContent = `🗓 ${displayDate} — ${sched.day}`;
+
             if (sched.classes.length === 0) {
-                div.innerHTML = `<div class="no-schedule"><div style="font-size:2.8em;margin-bottom:12px">🎉</div>${sched.day}<br><small style="opacity:.7">সাপ্তাহিক ছুটি — কোনো ক্লাস নেই</small></div>`;
+                div.innerHTML = `<div style="text-align:center; padding:30px;"><div style="font-size:2.8em;margin-bottom:12px">🎉</div>${sched.day}<br><small style="opacity:.7">সাপ্তাহিক ছুটি — কোনো ক্লাস নেই</small></div>`;
                 return;
             }
 
@@ -228,7 +233,6 @@
             `).join('');
         }
 
-        // RENDER TO-DO
         function renderTodos() {
             const list = document.getElementById('todoList');
             document.getElementById('totalCount').textContent = myTodos.length;
@@ -242,7 +246,6 @@
             `).join('');
         }
 
-        // NAV & EVENTS
         function prevMonth() { currentMonth--; if(currentMonth<0){currentMonth=11; currentYear--;} generateCalendar(currentYear, currentMonth); }
         function nextMonth() { currentMonth++; if(currentMonth>11){currentMonth=0; currentYear++;} generateCalendar(currentYear, currentMonth); }
 
@@ -250,7 +253,7 @@
             if (e.target.classList.contains('day-cell')) {
                 document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
                 e.target.classList.add('selected');
-                showSchedule(e.target.dataset.date, e.target.dataset.dayindex);
+                showSchedule(e.target.dataset.day, e.target.dataset.month, e.target.dataset.year, e.target.dataset.dayindex);
             }
         });
 
@@ -265,5 +268,4 @@
         renderTodos();
     </script>
 </body>
-<h4>Created by Shad and Raihan helps with information.</h4>
 </html>
