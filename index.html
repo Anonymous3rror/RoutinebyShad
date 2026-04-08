@@ -107,7 +107,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title" id="selectedDayTitle">📅 তারিখ নির্বাচন করুন</div>
+            <div class="section-title" id="selectedDayTitle">🗓 তারিখ নির্বাচন করুন</div>
             <div id="scheduleContent">
                 <div style="text-align:center; padding: 40px; color: var(--text-secondary);">ক্যালেন্ডার থেকে তারিখ দেখুন</div>
             </div>
@@ -213,7 +213,7 @@
             const title = document.getElementById('selectedDayTitle');
             const [y, m, d] = dateStr.split('-');
             
-            title.textContent = `📅 ${d}/${m}/${y} — ${sched.day}`;
+            title.textContent = `🗓 ${d}/${m}/${y} — ${sched.day}`;
             if (sched.classes.length === 0) {
                 div.innerHTML = `<div class="no-schedule"><div style="font-size:2.8em;margin-bottom:12px">🎉</div>${sched.day}<br><small style="opacity:.7">সাপ্তাহিক ছুটি — কোনো ক্লাস নেই</small></div>`;
                 return;
